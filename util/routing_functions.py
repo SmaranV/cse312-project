@@ -17,3 +17,6 @@ def verify_login():
 def register_user():
     return
 
+# logout user by removing auth token
+def logout_user():
+    return
