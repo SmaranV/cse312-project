@@ -3,7 +3,7 @@ import bcrypt
 import uuid
 import hashlib
 from flask import request, redirect, make_response
-
+import time
 
 
 mongo_client = MongoClient("mongo")
@@ -19,7 +19,7 @@ def verify_login():
     password = request.form.get('password')
     user = user_collection.find_one({"username": username})
 
-    if username is None or password is None:
+    if username is None or password is None or user is None:
         return "One of the fields is empty", 400
 
     if bcrypt.checkpw(password.encode('utf-8'), user['password']):
@@ -29,6 +29,7 @@ def verify_login():
             "username": user['username'],
             "token_hash": token_hash,
             "user_id": user['_id'],
+            "token_expire": int(time.time())+3600
         })
         response = make_response(redirect('/'))
         response.set_cookie('auth_token', auth_token, httponly=True, max_age=3600)
@@ -65,3 +66,14 @@ def register_user():
 # logout user by removing auth token
 def logout_user():
     return
+
+def validate_auth_token(token):
+    if token is None:
+        return False
+    token_hash = hashlib.sha256(token.encode('utf-8')).hexdigest()
+    userWithToken = auth_collection.find_one({"token_hash":token_hash})
+
+    if userWithToken is None:
+        return False
+    else:
+        return int(userWithToken["token_expire"])>int(time.time())
