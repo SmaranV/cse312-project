@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-from util.routing_functions import verify_login, logout_user, register_user
+from util.routing_functions import verify_login, logout_user, register_user, validate_auth_token, username_for_auth_token
 
 app = Flask(__name__)
 
@@ -10,7 +10,11 @@ def hello():
     # TODO: check for auth token. aka if user logged in
     # continue to homepage if auth token exists
     # if user isn't logged in, send them to landing page
-    return render_template('index.html')
+    auth=request.cookies.get('auth_token')
+    if validate_auth_token(auth):
+        return render_template('index.html',username=username_for_auth_token(auth))
+    else:
+        return render_template('landing.html')
 
 @app.route('/landing')
 def landing_page():
