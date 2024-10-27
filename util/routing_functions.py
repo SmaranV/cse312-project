@@ -60,7 +60,7 @@ def register_user():
         "username": username,
         "password": password_hash
     })
-    return redirect('/landing', 200)
+    return redirect('/landing')
 
 # logout user by removing auth token
 def logout_user():
