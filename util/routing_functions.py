@@ -40,9 +40,35 @@ def verify_login():
 # verify username doesn't already exist
 # then add user to user_collection
 def verify_pass():
-    # <------------------>  need to finish this for register     <------------------>
-    # we also have to show the username on the frontend 
-    return
+    username = request.form.get('username')
+    password = request.form.get('password1')
+
+    min_length = 8
+    requires_digit = any(char.isdigit() for char in password)
+    requires_upper = any(char.isupper() for char in password)
+    requires_lower = any(char.islower() for char in password)
+    requires_special = any(char in "!@#$%^&*()-_+=" for char in password)
+
+    if not username or not password:
+        return "Username and password cannot be empty", 400
+
+    if len(password) < min_length:
+        return "Password must be at least 8 characters long", 400
+    if not requires_digit:
+        return "Password must contain at least one digit", 400
+    if not requires_upper:
+        return "Password must contain at least one uppercase letter", 400
+    if not requires_lower:
+        return "Password must contain at least one lowercase letter", 400
+    if not requires_special:
+        return "Password must contain at least one special character ", 400
+
+    if user_collection.find_one({"username": username}):
+        return "Username already exists", 400
+
+    return None
+
+    
 
 def register_user():
     username = request.form.get('username')
@@ -54,7 +80,11 @@ def register_user():
            
     if user_collection.find_one({"username": username}):
         return "Username already taken", 400
-
+    
+    verification_result = verify_pass()
+    if verification_result is not None:
+        return verification_result
+    
     password_hash = bcrypt.hashpw(password1.encode('utf-8'), bcrypt.gensalt())
     user_collection.insert_one({ 
         "username": username,
@@ -64,4 +94,17 @@ def register_user():
 
 # logout user by removing auth token
 def logout_user():
-    return
+    auth_token = request.cookies.get('auth_token')
+
+    if not auth_token:
+        return "Error finding an Active seasiion to logout", 400
+    
+    token_hash = hashlib.sha256(auth_token.encode('utf-8')).hexdigest()
+
+    auth_collection.delete_one({"token_hash": token_hash})
+
+    response = make_response(redirect('/login'))
+    response.set_cookie('auth_token', '', httponly=True, expires=0) 
+
+    return response
+
