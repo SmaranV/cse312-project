@@ -20,7 +20,7 @@ def verify_login():
     user = user_collection.find_one({"username": username})
 
     if username is None or password is None or user is None:
-        return "One of the fields is empty", 400
+        return redirect("/?err=passwordsdontmatch", code=302)
 
     if bcrypt.checkpw(password.encode('utf-8'), user['password']):
         auth_token = str(uuid.uuid4())
@@ -35,7 +35,7 @@ def verify_login():
         response.set_cookie('auth_token', auth_token, httponly=True, max_age=3600)
         return response
     else:
-        return "Invalid username/password", 400
+        return redirect("/?err=passwordsdontmatch", code=302)
 
 # verify password matches requirements
 # verify username doesn't already exist
@@ -51,10 +51,10 @@ def register_user():
     password2 = request.form.get('password2')
 
     if password1 != password2:
-        return "Passwords do not match", 400
+        return redirect("/?err=regpasswordsdontmatch", code=302)
            
     if user_collection.find_one({"username": username}):
-        return "Username already taken", 400
+        return redirect("/?err=usernametaken", code=302)
 
     password_hash = bcrypt.hashpw(password1.encode('utf-8'), bcrypt.gensalt())
     user_collection.insert_one({ 
@@ -77,3 +77,7 @@ def validate_auth_token(token):
         return False
     else:
         return int(userWithToken["token_expire"])>int(time.time())
+def username_for_auth_token(token):
+    token_hash = hashlib.sha256(token.encode('utf-8')).hexdigest()
+    userWithToken = auth_collection.find_one({"token_hash":token_hash})
+    return userWithToken["username"]

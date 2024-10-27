@@ -1,11 +1,8 @@
 body {
-    background: rgb(21, 8, 70)
+    background: rgb(21, 8, 70);
+    color:aliceblue;
 }
 
 h1 {
-    color:coral
-}
-
-p {
-    color:aliceblue
+    color:coral;
 }
