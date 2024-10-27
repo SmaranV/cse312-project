@@ -51,21 +51,21 @@ def verify_pass():
     requires_special = any(char in "!@#$%^&*()-_+=" for char in password)
 
     if not username or not password:
-        return "Username and password cannot be empty", 400
+        return redirect("/")
 
     if len(password) < min_length:
-        return "Password must be at least 8 characters long", 400
+        return redirect("/?registerError=Password%20must%20be%20at%20least%208%20characters%20long")
     if not requires_digit:
-        return "Password must contain at least one digit", 400
+        return redirect("/?registerError=Password%20must%20contain%20at%20least%20one%20digit")
     if not requires_upper:
-        return "Password must contain at least one uppercase letter", 400
+        return redirect("/?registerError=Password%20must%20contain%20at%20least%20one%20uppercase%20letter")
     if not requires_lower:
-        return "Password must contain at least one lowercase letter", 400
+        return redirect("/?registerError=Password%20must%20contain%20at%20least%20one%20lowercase%20letter")
     if not requires_special:
-        return "Password must contain at least one special character ", 400
+        return redirect("/?registerError=Password%20must%20contain%20at%20least%20one%20special%20character")
 
     if user_collection.find_one({"username": username}):
-        return "Username already exists", 400
+        return redirect("/?registerError=Username%20already%20exists")
 
     return None
 
@@ -113,13 +113,13 @@ def logout_user():
     auth_token = request.cookies.get('auth_token')
 
     if not auth_token:
-        return "Error finding an Active seasiion to logout", 400
-    
+        return redirect('/')
+
     token_hash = hashlib.sha256(auth_token.encode('utf-8')).hexdigest()
 
     auth_collection.delete_one({"token_hash": token_hash})
 
-    response = make_response(redirect('/login'))
+    response = make_response(redirect('/'))
     response.set_cookie('auth_token', '', httponly=True, expires=0) 
 
     return response
