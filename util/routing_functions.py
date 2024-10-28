@@ -21,7 +21,7 @@ reaction_collection = db["reactions"]
 # verifies login credentials macth
 # issue auth token
 def verify_login():
-    username = request.form.get('username')
+    username = html.escape(request.form.get('username'))
     password = request.form.get('password')
     user = user_collection.find_one({"username": username})
 
@@ -32,7 +32,7 @@ def verify_login():
         auth_token = str(uuid.uuid4())
         token_hash = hashlib.sha256(auth_token.encode('utf-8')).hexdigest()
         auth_collection.insert_one({
-            "username": user['username'],
+            "username": html.escape(user['username']),
             "token_hash": token_hash,
             "user_id": user['_id'],
             "token_expire": int(time.time())+3600
@@ -47,7 +47,7 @@ def verify_login():
 # verify username doesn't already exist
 # then add user to user_collection
 def verify_pass():
-    username = request.form.get('username')
+    username = html.escape(request.form.get('username'))
     password = request.form.get('password1')
 
     min_length = 8
@@ -78,7 +78,7 @@ def verify_pass():
     
 
 def register_user():
-    username = request.form.get('username')
+    username = html.escape(request.form.get('username'))
     password1 = request.form.get('password1')
     password2 = request.form.get('password2')
 
