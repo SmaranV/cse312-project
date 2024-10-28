@@ -32,7 +32,7 @@ def verify_login():
         auth_token = str(uuid.uuid4())
         token_hash = hashlib.sha256(auth_token.encode('utf-8')).hexdigest()
         auth_collection.insert_one({
-            "username": html.escape(user['username']),
+            "username": user['username'],
             "token_hash": token_hash,
             "user_id": user['_id'],
             "token_expire": int(time.time())+3600
