@@ -3,18 +3,41 @@
         <title>Y.com</title>
         <!-- The CSS file must be in the static/ folder -->
         <link rel="stylesheet" href="/static/style.css" /> 
+        <link rel="stylesheet" href="/static/index.css"/>
+
     </head> 
     <body>
         <form action="/logout" method="post">
-            <button type="submit">Submit</button>
+            <button type="submit">logout</button>
         </form>
         <!-- 
             You change whatever you want here. 
             We need to host an image. This is just skeleton stuff. 
         -->
         <h1>Welcome to Y.com {{username}}</h1>
-        
+        <div id="posts"></div>
+        <form id="postForm" action="/post" method="post">
+            <label>
+                Post Title<br>
+                <input type="text" name="title"><br>
+            </label>
+            <label>
+                Post Description<br>
+                <textarea name="description"></textarea><br>
+            </label>
+            <button type="submit">Post</button>
+        </form>
         <!-- The javascript files to be in the static/ folder. rename the js file if you want. -->
-         <script src="/static/utility.js"></script>
+        <template id="postTemplate">
+            <div class="post">
+                <!-- new inputs will all have the same names quantity/price/description this will result to the server receiving an array of values for each -->
+                <h2 class="title"></h2>
+                <p class="description"></p>
+                <img class="likeButton" src="/static/like.webp">
+                <span class="likeCount">0</span>
+            </div>
+        </template>
+        <script src="/static/index.js"></script>
+        <script src="/static/utility.js"></script>
     </body> 
 </html> 
