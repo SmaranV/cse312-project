@@ -1,0 +1,24 @@
+h1{
+    text-align: center;
+}
+#posts{
+    height: 70vh;
+    overflow-y: scroll;
+}
+.post{
+    margin: 0 auto;
+    width: 90%;
+    border: 1px solid wheat;
+    border-radius: 8px;
+}
+#postForm{
+    width: fit-content;
+    margin: 0 auto;
+}
+.likeButton{
+    width: 24px;
+    filter:saturate(0);
+}
+.liked{
+    filter: saturate(1);
+}

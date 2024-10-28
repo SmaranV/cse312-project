@@ -1,7 +1,11 @@
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 import bcrypt
 import uuid
 import hashlib
+import json
+import html
+from bson.json_util import dumps
 from flask import request, redirect, make_response
 import time
 
@@ -10,6 +14,8 @@ mongo_client = MongoClient("mongo")
 db = mongo_client["cse312"]
 user_collection = db["users"]
 auth_collection = db["auth_tokens"]
+post_collection = db["messages"]
+reaction_collection = db["reactions"]
 
 
 # verifies login credentials macth
@@ -123,3 +129,45 @@ def logout_user():
     response.set_cookie('auth_token', '', httponly=True, expires=0) 
 
     return response
+
+def send_post():
+    auth_token = request.cookies.get('auth_token')
+    user=username_for_auth_token(auth_token)
+    post_collection.insert_one({
+        "title":html.escape(request.form.get('title')),
+        "description":html.escape(request.form.get('description')),
+        "time": int(time.time()),
+        "username":user
+    })
+    return dumps({'success':True}), 200, {'ContentType':'application/json'}
+
+def send_post_history():
+    pipeline = [
+    {
+        '$lookup': {
+            'from': 'reactions', 
+            'localField': '_id', 
+            'foreignField': 'postID', 
+            'as': 'reactions'
+        }
+    }
+]
+    auth_token = request.cookies.get('auth_token')
+    user= "" if auth_token is None else username_for_auth_token(auth_token)
+    return dumps([user,post_collection.aggregate(pipeline)]), 200, {'ContentType':'application/json'} 
+
+def likePost():
+    auth_token = request.cookies.get('auth_token')
+    user=username_for_auth_token(auth_token)
+    query={
+        "username": user,
+        "reaction":"LIKE",
+        "postID":ObjectId(request.form.get("postID"))
+    }
+    alreadyLiked = reaction_collection.find_one(query)
+
+    if alreadyLiked is None:
+        reaction_collection.insert_one(query)
+    else:
+        reaction_collection.delete_many(query)
+    return dumps({'success':True}), 200, {'ContentType':'application/json'} 

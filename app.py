@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template
-from util.routing_functions import verify_login, logout_user, register_user, validate_auth_token, username_for_auth_token
+from util.routing_functions import verify_login, logout_user, register_user, validate_auth_token, username_for_auth_token, send_post, send_post_history, likePost
 
 app = Flask(__name__)
 
@@ -32,7 +32,16 @@ def register():
 def logout():
     return logout_user()
 
+@app.post('/post')
+def post_post():
+    return send_post()
 
+@app.get('/post')
+def get_posts():
+    return send_post_history()
+@app.post('/likePost')
+def like_post():
+    return likePost()
 # Set cookies for all responses
 @app.after_request
 def add_header(response):
