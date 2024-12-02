@@ -114,10 +114,11 @@ def validate_auth_token(token):
         return False
     else:
         return int(userWithToken["token_expire"])>int(time.time())
+
 def username_for_auth_token(token):
     token_hash = hashlib.sha256(token.encode('utf-8')).hexdigest()
     userWithToken = auth_collection.find_one({"token_hash":token_hash})
-    return userWithToken.get("username", "")
+    return userWithToken["username"] if userWithToken else ""
   
 # logout user by removing auth token
 def logout_user():
