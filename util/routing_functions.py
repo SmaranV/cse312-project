@@ -5,6 +5,7 @@ import uuid
 import hashlib
 import json
 import html
+import filetype
 from bson.json_util import dumps
 import os
 from flask import request, redirect, make_response, send_from_directory
@@ -20,7 +21,7 @@ post_collection = db["messages"]
 reaction_collection = db["reactions"]
 
 UPLOAD_FOLDER = "uploads"
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", ""}
 
 # verifies login credentials macth
 # issue auth token
@@ -134,8 +135,13 @@ def logout_user():
 
     return response
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# validate the uploaded file by checking the magic numbers
+def allowed_file(file_stream):
+    kind = filetype.guess_extension(file_stream)
+    if kind is None:
+        return False
+    return kind in ALLOWED_EXTENSIONS
 
 def send_post():
     auth_token = request.cookies.get('auth_token')
@@ -143,12 +149,20 @@ def send_post():
     
     imageURL = None
     file = request.files.get('image')
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(UPLOAD_FOLDER, filename)
-        imageURL = f"/{UPLOAD_FOLDER}/{filename}"
-        file.save(file_path)
-    
+
+    if file:
+        filebytes = file.stream.read()
+        file.stream.seek(0)
+
+        if allowed_file(filebytes):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(UPLOAD_FOLDER, f"{filename}")
+            imageURL = f"/{UPLOAD_FOLDER}/{filename}"
+            file.save(file_path)
+
+        else:
+            return redirect("/?err=InvalidImagetype", code=400)
+        
     post = {
         "title":html.escape(request.form.get('title')),
         "description":html.escape(request.form.get('description')),
