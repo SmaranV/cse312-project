@@ -1,3 +1,10 @@
+const socket = io({
+    transports: ["websocket"], // Forces the use of WebSocket
+});
+
+socket.on("reaction",(e)=>{
+    console.log(e)
+})
 function addPost(title,description,id,likedByUser,likeCount) {
     let template = document.getElementById("postTemplate")
     let html = template.content.cloneNode(true)
