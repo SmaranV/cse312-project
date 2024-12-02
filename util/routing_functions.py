@@ -117,7 +117,7 @@ def validate_auth_token(token):
 def username_for_auth_token(token):
     token_hash = hashlib.sha256(token.encode('utf-8')).hexdigest()
     userWithToken = auth_collection.find_one({"token_hash":token_hash})
-    return userWithToken["username"]
+    return userWithToken.get("username", "")
   
 # logout user by removing auth token
 def logout_user():
