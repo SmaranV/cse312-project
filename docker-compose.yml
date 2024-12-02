@@ -9,5 +9,3 @@ services:
       - ./uploads:/code/uploads
   mongo:
     image: mongo:4.2.5
-    ports:
-      - '27017:27017'
