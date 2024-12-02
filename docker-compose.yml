@@ -5,6 +5,8 @@ services:
       WAIT_HOSTS: mongo:27017
     ports:
       - "8080:5000"
+    volumes:
+      - ./uploads:/code/uploads
   mongo:
     image: mongo:4.2.5
     ports:
