@@ -162,7 +162,9 @@ def send_post_history():
 ]
     auth_token = request.cookies.get('auth_token')
     user= "" if auth_token is None else username_for_auth_token(auth_token)
-    return dumps([user,post_collection.aggregate(pipeline)]), 200, {'ContentType':'application/json'} 
+    posts_cursor = post_collection.aggregate(pipeline)
+    posts = list(posts_cursor)
+    return dumps([user, posts]), 200, {'ContentType': 'application/json'}
 
 def likePost():
     auth_token = request.cookies.get('auth_token')
