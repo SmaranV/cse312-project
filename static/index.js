@@ -1,12 +1,21 @@
-function addPost(title,description,id,likedByUser,likeCount) {
+function addPost(title,description,id,likedByUser,likeCount,imageURL) {
     let template = document.getElementById("postTemplate")
     let html = template.content.cloneNode(true)
+    
     html.querySelector(".title").innerHTML=title
     html.querySelector(".description").innerHTML=description
     html.querySelector(".likeCount").innerHTML=likeCount
+    
+    if(imageURL){
+        let postImage = html.querySelector(".post-image");
+        postImage.src = imageURL;
+        postImage.style.display = "block";
+    }
+
     if(likedByUser){
         html.querySelector(".likeButton").classList.add("liked")
     }
+
     document.getElementById("posts").appendChild(html)
     //find delete button on newest item and add event listener to delete its parent
     let likeButton = document.querySelectorAll(".likeButton")
@@ -33,7 +42,7 @@ function getPosts(){
                         likedByUser=true
                     }
                 })
-                addPost(post.title,post.description,post._id.$oid,likedByUser,post.reactions.length)
+                addPost(post.title,post.description,post._id.$oid,likedByUser,post.reactions.length,post.imageURL)
             });
         })
 }

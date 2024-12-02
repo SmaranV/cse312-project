@@ -6,7 +6,9 @@ import hashlib
 import json
 import html
 from bson.json_util import dumps
-from flask import request, redirect, make_response
+import os
+from flask import request, redirect, make_response, send_from_directory
+from werkzeug.utils import secure_filename
 import time
 
 
@@ -138,15 +140,26 @@ def allowed_file(filename):
 def send_post():
     auth_token = request.cookies.get('auth_token')
     user=username_for_auth_token(auth_token)
-
-
-
-    post_collection.insert_one({
+    
+    imageURL = None
+    file = request.files.get('image')
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        imageURL = f"/{UPLOAD_FOLDER}/{filename}"
+        file.save(file_path)
+    
+    post = {
         "title":html.escape(request.form.get('title')),
         "description":html.escape(request.form.get('description')),
         "time": int(time.time()),
-        "username":user
-    })
+        "username":user,
+    }
+
+    if imageURL:
+        post['imageURL'] = imageURL
+    
+    post_collection.insert_one(post)
     return dumps({'success':True}), 200, {'ContentType':'application/json'}
 
 def send_post_history():
@@ -164,6 +177,11 @@ def send_post_history():
     user= "" if auth_token is None else username_for_auth_token(auth_token)
     posts_cursor = post_collection.aggregate(pipeline)
     posts = list(posts_cursor)
+
+    # handling older posts saved to DB that don't have images
+    for post in posts:
+        post["imageURL"] = post.get('imageURL', None)
+
     return dumps([user, posts]), 200, {'ContentType': 'application/json'}
 
 def likePost():

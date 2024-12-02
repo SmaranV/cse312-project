@@ -1,5 +1,5 @@
-from flask import Flask, request, render_template
-from util.routing_functions import verify_login, logout_user, register_user, validate_auth_token, username_for_auth_token, send_post, send_post_history, likePost, handle_media
+from flask import Flask, request, render_template, send_from_directory
+from util.routing_functions import verify_login, logout_user, register_user, validate_auth_token, username_for_auth_token, send_post, send_post_history, likePost
 
 app = Flask(__name__)
 
@@ -44,9 +44,9 @@ def get_posts():
 def like_post():
     return likePost()
 
-@app.post('/upload')
-def upload_media():
-    return handle_media()
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory("uploads", filename)
 
 # Set cookies for all responses
 @app.after_request
