@@ -5,7 +5,7 @@ Link : https://312buzzerbeaters.com/
 The Theme Selector feature allows users to toggle between Default, Light, and Dark themes. The chosen theme is applied dynamically and saved in the browser, ensuring the user's preference persists across sessions.
 
 #### Testing Procedure
-1. Navigate to the public deployment.
+1. Navigate to the public deployment: https://312buzzerbeaters.com/
 2. Register and Login from the Landing page.
 3. Verify you are logged in and your username is displayed at the top
 4. From the homepage locate the Theme Selector dropdown at the top right.
