@@ -7,6 +7,16 @@
 
     </head> 
     <body>
+        <!-- Theme Selector Dropdown -->
+        <div id="theme-selector" style="text-align: right; margin: 10px;">
+            <label for="theme">Choose Theme:</label>
+            <select id="theme">
+                <option value="default">Default</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+            </select>
+        </div>
+        
         <form action="/logout" method="post">
             <button type="submit">logout</button>
         </form>

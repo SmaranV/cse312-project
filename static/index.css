@@ -1,30 +1,50 @@
-h1{
+/* Default Theme (already provided) */
+h1 {
     text-align: center;
 }
-#posts{
+#posts {
     height: 70vh;
     overflow-y: scroll;
 }
-.post{
+.post {
     margin: 0 auto;
     width: 90%;
     border: 1px solid wheat;
     border-radius: 8px;
 }
-#postForm{
+#postForm {
     width: fit-content;
     margin: 0 auto;
 }
-.likeButton{
+.likeButton {
     width: 24px;
-    filter:saturate(0);
+    filter: saturate(0);
 }
-.liked{
+.liked {
     filter: saturate(1);
 }
-
 .post img {
     max-width: 100%;
     max-height: 300px;
     border-radius: 5px;
+}
+
+/* Light Theme */
+body.light {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+body.light .post {
+    border: 1px solid #ddd;
+}
+
+/* Dark Theme */
+body.dark {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark .post {
+    border: 1px solid #444;
 }
